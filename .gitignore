@@ -1,0 +1,9 @@
+# venvs / build
+.venv/
+.venv-*/
+build/
+dist/
+*.spec
+__pycache__/
+*.pyc
+.DS_Store

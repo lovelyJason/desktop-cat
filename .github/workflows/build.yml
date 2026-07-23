@@ -1,0 +1,47 @@
+name: Build Windows EXE
+
+# 触发方式：手动运行，或推送 tag（如 v1.0.0）时自动构建并发布
+on:
+  workflow_dispatch:
+  push:
+    tags:
+      - "v*"
+
+jobs:
+  build-windows:
+    runs-on: windows-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+
+      - name: Install dependencies
+        run: |
+          python -m pip install --upgrade pip
+          pip install -r requirements.txt
+          pip install pyinstaller
+
+      - name: Build EXE
+        run: >
+          pyinstaller --noconfirm --clean --onefile --windowed
+          --name DesktopCat
+          --add-data "assets;assets"
+          --icon "assets/cat.ico"
+          main.py
+
+      - name: Upload artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: DesktopCat-windows
+          path: dist/DesktopCat.exe
+
+      # 打了版本 tag 时，顺便发布到 Release，方便直接下载
+      - name: Publish to Release
+        if: startsWith(github.ref, 'refs/tags/')
+        uses: softprops/action-gh-release@v2
+        with:
+          files: dist/DesktopCat.exe
