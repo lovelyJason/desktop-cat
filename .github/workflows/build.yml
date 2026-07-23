@@ -10,6 +10,9 @@ on:
 jobs:
   build-windows:
     runs-on: windows-latest
+    # 创建 Release 需要写权限，否则默认只读 token 会返回 403
+    permissions:
+      contents: write
     steps:
       - name: Checkout
         uses: actions/checkout@v4
